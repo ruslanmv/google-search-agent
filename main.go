@@ -36,7 +36,7 @@ func googleSearch(ctx context.Context, payload json.RawMessage) (interface{}, er
     }
 
     apiKey := os.Getenv("GOOGLE_API_KEY")
-    cseID  := os.Getenv("GOOGLE_CSE_ID")
+    cseID := os.Getenv("GOOGLE_CSE_ID")
     if apiKey == "" || cseID == "" {
         return nil, fmt.Errorf("GOOGLE_API_KEY and GOOGLE_CSE_ID must be set")
     }
@@ -84,7 +84,7 @@ func main() {
     s.AddHTTPHandler("/health", func(w http.ResponseWriter, r *http.Request) {
         w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusOK)
-        fmt.Fprintf(w, `{"status":"ok"}`)
+        fmt.Fprint(w, `{"status":"ok"}`)
     })
     s.AddHTTPHandler("/version", func(w http.ResponseWriter, r *http.Request) {
         w.Header().Set("Content-Type", "application/json")
@@ -102,10 +102,24 @@ func main() {
     )
     s.AddTool(googleTool, googleSearch)
 
+    // Mount the MCP HTTP handler
+    mux := http.NewServeMux()
+    mux.Handle("/", server.NewStreamableHTTPServer(s))
+    mux.Handle("/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprint(w, `{"status":"ok"}`)
+    }))
+    mux.Handle("/version", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintf(w, `{"name":"%s","version":"%s"}`, appName, appVersion)
+    }))
+
     // Start the HTTP server on port 8080
     addr := ":8080"
     fmt.Printf("Starting %s on %s\n", appName, addr)
-    if err := http.ListenAndServe(addr, server.WithHandler(s)); err != nil {
+    if err := http.ListenAndServe(addr, mux); err != nil {
         fmt.Fprintf(os.Stderr, "Server error: %v\n", err)
         os.Exit(1)
     }

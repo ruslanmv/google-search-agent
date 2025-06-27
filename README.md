@@ -1,7 +1,7 @@
 
 # 🐦 Google Search Agent
 
-> Author: ruslanmv.com  
+> Author: Ruslan Magana Vsevolodovna
 > A minimal Go-based MCP agent that exposes a `google_search` tool, powered by the Google Custom Search API.
 
 [![Go Version](https://img.shields.io/badge/go-1.23-blue)]()
@@ -66,9 +66,9 @@ You can also override defaults with flags:
 google-search-agent -listen=0.0.0.0 -port=8080
 ```
 
-* `-listen` (default `0.0.0.0`) — interface to bind
-* `-port`   (default `8080`)    — port to listen on
-* `-help`                        — show usage
+* `-listen` (default `0.0.0.0`): interface to bind
+* `-port`   (default `8080`): port to listen on
+* `-help`: show usage
 
 ---
 
@@ -141,7 +141,7 @@ make docker-build
 make docker-run
 ```
 
-Under the hood this runs:
+Under the hood, this runs:
 
 ```bash
 docker build -t google-search-agent:latest .
@@ -176,4 +176,3 @@ make coverage     # HTML report in dist/coverage.html
 ```bash
 go mod tidy
 ```
-

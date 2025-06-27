@@ -1,152 +1,61 @@
-# =============================================================================
-# 🛠️  PRE-COMMIT CONFIG  - GOOGLE-SEARCH-AGENT  (Go project)
-# =============================================================================
-# Install / run:
-#   pip install --user pre-commit
-#   pre-commit install
-#   pre-commit run --all-files
-#
-# To skip checks:
-#   git commit -m "msg" --no-verify
-#
-# To update hooks:
-#   pre-commit autoupdate
-#   pre-commit install
-#   pre-commit run --all-files
-# =============================================================================
+# .golangci.yml
+# Configuration for golangci-lint
+# https://golangci-lint.run/usage/configuration/
 
-repos:
-  # ---------------------------------------------------------------------------
-  # 🔐 Security / secret detection
-  # ---------------------------------------------------------------------------
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.27.2
-    hooks:
-      - id: gitleaks
-        name: 🔐 Gitleaks – detect hard-coded secrets
+run:
+  # Timeout for the entire lint run
+  timeout: 5m
+  # Directories to skip
+  skip-dirs:
+    - dist
+    - vendor
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: detect-private-key
-        name: 🔐 Detect private key
-        types: [text]
+linters:
+  enable:
+    - govet            # vet diagnostics
+    - staticcheck      # a go vet on steroids
+    - errcheck         # check for unchecked errors
+    - gosimple         # simplify code
+    - unused           # unused code
+    - deadcode         # find unused code
+    - gocyclo          # cyclomatic complexity
+    - gofmt            # gofmt simplicity
+    - goimports        # missing or ungrouped imports
+    - ineffassign      # detect ineffectual assignments
+    - misspell         # find commonly misspelled words
+    - structcheck      # find unused struct fields
+    - varcheck         # find unused global variables/constants
+  disable:
+    - dupl             # false positives in small codebases
+    - goconst          # not critical for this demo
 
-  # ---------------------------------------------------------------------------
-  # ❌ AI artefact & placeholder blockers
-  # ---------------------------------------------------------------------------
-  - repo: local
-    hooks:
-      - id: forbid-content-reference
-        name: ❌ Forbid :contentReference
-        entry: ":contentReference"
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+linters-settings:
+  gofmt:
+    simplify: true
 
-      - id: forbid-oai-citations
-        name: ❌ Forbid OpenAI citations
-        entry: '\[oaicite:\?\?\d+\]'
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+  goimports:
+    local-prefixes: github.com/ruslannv/google-search-agent
 
-      - id: forbid-ai-stock-phrases
-        name: ❌ Forbid AI stock phrases
-        entry: "(?i)(as an ai language model|i don't have real-time information|my knowledge cutoff|i cannot browse the internet)"
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+  gocyclo:
+    min-complexity: 15
 
-      - id: forbid-placeholder-citations
-        name: ❌ Forbid Placeholder citations
-        entry: '\([A-Z][a-z]+,?\s+\d{4}\)'
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+  misspell:
+    locale: US
 
-      - id: forbid-source-placeholders
-        name: ❌ Forbid source placeholders
-        entry: '(?i)\(source:'
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+  errcheck:
+    # ignore error checks in fmt.Printf family
+    ignore-patterns:
+      - '^fmt\.'
 
-      - id: forbid-malformed-code-fences
-        name: ❌ Forbid malformed code fences
-        entry: "````+"
-        language: pygrep
-        types: [text]
-        exclude: ^\.pre-commit-config\.yaml$
+issues:
+  # Stop on the first 0 issues per linter (0 = no limit)
+  max-issues-per-linter: 0
+  max-same-issues: 0
 
-      - id: warn-ai-transitions
-        name: ⚠️ Warn AI transition phrases
-        entry: "(?i)(to summarize,|please note that)"
-        language: pygrep
-        types: [text]
-        verbose: true
-        exclude: ^\.pre-commit-config\.yaml$
+  exclude-use-default: false
 
-  # ---------------------------------------------------------------------------
-  # 🔤 Unicode text normalization (smart quotes, ligatures, exotic spaces)
-  # ---------------------------------------------------------------------------
-  - repo: https://github.com/sirosen/texthooks
-    rev: v0.6.8
-    hooks:
-      - id: fix-smartquotes
-        name: 📝 Normalize smart quotes
-      - id: fix-ligatures
-        name: 🔡 Normalize ligatures
-      - id: fix-spaces
-        name: ␣ Normalize Unicode spaces
-      - id: forbid-bidi-controls
-        name: 🚫 Forbid BiDi Unicode Controls
-
-  # ---------------------------------------------------------------------------
-  # 🧹 Generic formatting & whitespace
-  # ---------------------------------------------------------------------------
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: end-of-file-fixer
-        name: 🧹 Fix end of file
-      - id: trailing-whitespace
-        name: 🧹 Trim trailing whitespace
-      - id: fix-byte-order-marker
-        name: 🧹 Fix UTF-8 BOM
-      - id: mixed-line-ending
-        name: 🧹 Mixed line ending
-        args: [--fix=lf]
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-merge-conflict
-      - id: check-symlinks
-      - id: destroyed-symlinks
-      - id: check-executables-have-shebangs
-      - id: check-shebang-scripts-are-executable
-      - id: forbid-new-submodules
-      - id: check-json
-      - id: check-yaml
-      - id: check-toml
-      - id: check-xml
-
-  # ---------------------------------------------------------------------------
-  # 🐹 Go tool-chain (formatters + linters)
-  # ---------------------------------------------------------------------------
-  - repo: https://github.com/dnephin/pre-commit-golang
-    rev: v0.5.1
-    hooks:
-      - id: go-fmt
-      - id: go-imports
-      - id: go-vet
-      - id: golangci-lint
-      - id: go-mod-tidy
-
-  - repo: https://github.com/segmentio/golines
-    rev: v0.12.2
-    hooks:
-      - id: golines
-        name: 🧹 golines – wrap long lines
-        args: ["--max-len=120","--base-formatter=gofumpt"]
-
-# end of pre-commit-config.yaml
+  # Exclude generated files and test files from certain linters
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo

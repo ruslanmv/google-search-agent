@@ -1,4 +1,11 @@
 {
-  "function": "google_search",
-  "payload": { "query": "IBM WatsonX" }
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "google_search",
+    "arguments": {
+      "query": "IBM WatsonX"
+    }
+  },
+  "id": 1
 }
