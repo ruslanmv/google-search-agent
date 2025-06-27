@@ -6,10 +6,10 @@ This document walks you through the steps to get the **google-search-agent** up 
 
 ## 1. Prerequisites
 
-- **Go 1.23+** (for building from source)
-- **Make** & **Git**
-- **Docker** (optional, for containerized run)
-- A Google Custom Search API key and CSE ID:
+- **Go 1.23+** (for building from source)  
+- **Make** & **Git**  
+- **Docker** (optional, for containerized run)  
+- A Google Custom Search API key and CSE ID:  
   - Create or retrieve these from the [Google Cloud Console](https://console.cloud.google.com/).
 
 ---
@@ -25,14 +25,14 @@ cd google-search-agent
 
 ## 3. Configure Credentials
 
-Create a file named `.env` in the project root (this will be used by both Makefile and Docker):
+Create a file named `.env` in the project root (this will be used by both the Makefile and Docker):
 
 ```dotenv
 GOOGLE_API_KEY=your_actual_api_key_here
 GOOGLE_CSE_ID=your_custom_search_engine_id_here
 ```
 
-Alternatively, you can export them directly in your shell:
+Alternatively, export them directly in your shell:
 
 ```bash
 export GOOGLE_API_KEY=your_actual_api_key_here
@@ -57,7 +57,7 @@ export GOOGLE_CSE_ID=your_custom_search_engine_id_here
    make run
    ```
 
-   If you prefer to run the binary directly:
+   Or invoke the binary directly:
 
    ```bash
    GOOGLE_API_KEY=$GOOGLE_API_KEY \
@@ -141,4 +141,23 @@ To remove build artifacts:
 ```bash
 make clean
 ```
+
+---
+
+## 9. Rebuild After Dependency Changes
+
+If you ever add, upgrade, or remove a Go module dependency, be sure to regenerate your `go.sum` and rebuild both the local binary and the Docker image:
+
+```bash
+# 1) Update go.mod/go.sum
+go mod tidy
+
+# 2) Build locally to verify
+go build -o google-search-agent .
+
+# 3) Rebuild the Docker image
+docker build -t google-search-agent:latest .
+```
+
+You can then re-run either the local binary or the Docker container as before.
 
