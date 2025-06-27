@@ -176,3 +176,8 @@ make coverage     # HTML report in dist/coverage.html
 ```bash
 go mod tidy
 ```
+```bash
+bash test.sh
+
+```
+![](assets/2025-06-28-01-02-51.png)
