@@ -1,0 +1,4 @@
+{
+  "function": "google_search",
+  "payload": { "query": "IBM WatsonX" }
+}
